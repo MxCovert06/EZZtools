@@ -21,5 +21,22 @@ When the Python file is placed in the `Ztools` folder, you can then run it by ri
 
 You will see a GUI with several buttons and sidebar. This confirms proper installation!
 
+## Initial Version: 3/25/2026
+This is the first version of EZEZTools on github. Some of the current features include:
+- importing artifact files (.HVE, .EVTX, MFT, .PF, .LNK)
+- Automatic Detection of files to respective tooling
+- Clear and visible output of Zimmerman tools as-is on a command line environment
+- Saving of output files (Currently CSV)
+- Options to open most recent file with EZViewer OR Timeline Explorer
 
+## Future Features and Additions
+In the coming versions and revisions of this tool I hope to add:
+- Modular python implementation to make more-visible code
+- Working Array of recently processed files
+- Options for tools
+- More Tooling support
+- Better UI design
+- Possible Drag and Drop
 
+## Closing note
+Thank you for viewing my project! I also would like to extend a huge thank you to Eric Zimmerman for the work he has done on these individual tools. They are a major cornerstone to forensics and I hope to develop some of my own tools to implement.

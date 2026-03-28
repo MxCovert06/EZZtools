@@ -8,7 +8,6 @@ __pycache__/
 
 *.dll
 *.json
-*.ico
 
 EvtxeCmd/
 EZViewer/

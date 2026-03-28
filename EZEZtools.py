@@ -111,54 +111,44 @@ class GUI(tk.CTk):
         self.iconbitmap(os.path.join(os.path.dirname(__file__), "favicon.ico"))
         self.title("EZ-ZTools V1.1")
         self.geometry("860x540")
-        self.geometry("900x600")
+        self.geometry("1700x600")
         self.minsize(800, 500)
         self.generated_csvs = []
         self.generated_csv = None
         
-
-        header_frame = tk.CTkFrame(self, corner_radius=12)
-        header_frame.pack(fill="x", padx=10, pady=(10,5))
-
-        self.title_label = tk.CTkLabel(header_frame, text="EZ-ZTools V1.1", font=("Helvetica", 20, "bold"))
-        self.title_label.pack(side="left", padx=10)
-
-        self.status_label = tk.CTkLabel(header_frame, text="Select a file to begin.", font=("Helvetica", 12), text_color="gray")
-        self.status_label.pack(side="right", padx=10)
-
         
-        frame_top = tk.CTkFrame(self)
-        frame_top.pack(pady=10, padx=10, fill="x")
-        self.file_label = tk.CTkLabel(frame_top, text="Select File")
-        self.file_label.pack(side="left",padx=5)
+
+       
+        sidebar = tk.CTkFrame(self, width=100)
+        sidebar.pack(side="left", fill="y", padx=5, pady=5)
+        
 
         # Actions
-
+        global frame_middle
         frame_middle = tk.CTkFrame(self)
         frame_middle.pack(pady=10,padx=10,fill="x")
-
-        selectBTN = tk.CTkButton(frame_middle,text="Select a File",command=self.browse_file)
-        selectBTN.pack(side="right",padx=5)
+        self.file_label = tk.CTkLabel(frame_middle, text="Select File")
+        
+        selectBTN = tk.CTkButton(frame_middle,text="Select File",command=self.browse_file)
+        selectBTN.pack(side="right",padx=10)
         processBTN = tk.CTkButton(frame_middle,text="Process File", command=self.process_file)
         processBTN.pack(side="left",padx=5)
 
         clearBTN = tk.CTkButton(frame_middle, text="Clear Output", command=self.clear_output)
-        clearBTN.pack(side="right",padx=5)
+        clearBTN.pack(side="right",padx=10)
 
-        ezvBTN = tk.CTkButton(frame_middle, text="Open in EZViewer", command=self.launch_ezviewer )
+        ezvBTN = tk.CTkButton(frame_middle, text="Open EZViewer", command=self.launch_ezviewer )
         ezvBTN.pack(side="left", padx=10)
 
-        tleBTN = tk.CTkButton(frame_middle, text="Open in Timeline Explorer (CSV Only)", command=self.launch_tle)
+        tleBTN = tk.CTkButton(frame_middle, text="Open Timeline Explorer (CSV)", command=self.launch_tle)
         tleBTN.pack(side="left", padx=10)
 
         # SIDE BAR FOR OUTPUTS
-        sidebar = tk.CTkFrame(self, width=200)
-        sidebar.pack(side="left", fill="y", padx=5, pady=5)
+        
 
         self.sidebar = sidebar
-
-        title = tk.CTkLabel(sidebar, text="Recent CSVs", font=("Courier", 14))
-        title.pack(pady=5)
+        self.sb_btn = tk.CTkButton(frame_middle,text="Open ShellBag Explorer",command=self.launch_SBexplorer)
+       
         # Outputs
 
         frame_bottom = tk.CTkFrame(self)
@@ -170,12 +160,21 @@ class GUI(tk.CTk):
     
         self.recentCSVs = []
     ## FILE FUNCTIONS
+
+        
     def browse_file(self):
-        file = filedialog.askopenfilename(filetypes=[("Supported files", "*.hve *.pf *.evtx *.lnk *.mft"),
+        file = filedialog.askopenfilename(filetypes=[("Supported files", "*.hve *.pf *.evtx *.lnk *.mft *.dat"),
         ("All files", "*.*")])
         if file:
             self.file_label.configure(text=file)
             self.output_box.insert("end", f"Selected: {file}\n")
+            self.file_ext = os.path.splitext(file)[1].lower()  # store extension
+            if self.checkDAT():
+                self.sb_btn.pack(side="left", padx=10)
+            else:
+                self.sb_btn.pack_forget()
+            
+        
     
     def process_file(self):
         file_path = self.file_label.cget("text")
@@ -206,12 +205,16 @@ class GUI(tk.CTk):
         ezviewer_path = os.path.join(os.path.dirname(__file__),"EZViewer","EZViewer.exe")
         if not os.path.exists(ezviewer_path):
             print("EZViewer.exe not found!")
+        
             return
+        file_path = self.file_label.cget("text")
+        subprocess.Popen([ezviewer_path, file_path])
         
     def launch_tle(self):
         tle_path = os.path.join(os.path.dirname(__file__),"TimelineExplorer","TimelineExplorer.exe")
         if not os.path.exists(tle_path):
             print("TimelineExplorer.exe not found!")
+            self.output_box.insert("end","TimelineExplorer.exe not Found! FATAL!")
             return    
         
         if not hasattr(self,"generated_csvs") or not self.generated_csvs:
@@ -223,6 +226,19 @@ class GUI(tk.CTk):
         file = filedialog.askopenfilename(filetypes=[("CSV files","*.csv")])
         if file:
             self.launch_ezviewer(file)
+
+    def checkDAT(self):
+        return hasattr(self, "file_ext") and self.file_ext == ".dat"
+    def launch_SBexplorer(self):
+
+        sbe_path = os.path.join(os.path.dirname(__file__),"ShellBagsExplorer","ShellBagsExplorer.exe")
+        if not os.path.exists(sbe_path):
+            self.output_box.insert("end","ShellBagsExplorer.exe not Found! FATAL!")
+        file_path = self.file_label.cget("text")
+        subprocess.Popen([sbe_path, file_path])
+
+
+
 
     ## EXTRANEOUS FUNCTIONS
     def clear_output(self):

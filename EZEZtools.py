@@ -56,7 +56,13 @@ TOOL_MAP =  {
     ".automaticDestinations-ms":{
         "path":"",
         "exe":"JLECmd",
-        "args":["-f"]}
+        "args":["-f"]},
+
+    ".bcf":{
+        "path":"",
+        "exe":"RecentFileCacheParser.exe",
+        "args":["-f"]
+    }
 }
 
 def get_tool(path):
@@ -70,13 +76,20 @@ def get_tool(path):
                 "args":["-f"]
             }
         
+        if name.lower() == "srudb.dat":
+            return {
+                "path":"",
+                "exe":"SrumECmd.exe",
+                "args":["-f"]
+            }
+        
         return TOOL_MAP.get(ext)
 
 
 def run_tool(path):
         tool = get_tool(path)
         if not tool:
-            return None, "Unsupported File Type! Select from:\n MFT \n .HVE \n .EVTX \n .PF \n"
+            return None, "Unsupported File Type! Select from:\n MFT \n .HVE \n .EVTX \n .PF \n .bcf \n"
         
         base_dir = os.path.dirname(__file__)
 
@@ -230,15 +243,14 @@ class GUI(tk.CTk):
     def checkDAT(self):
         return hasattr(self, "file_ext") and self.file_ext == ".dat"
     def launch_SBexplorer(self):
-
         sbe_path = os.path.join(os.path.dirname(__file__),"ShellBagsExplorer","ShellBagsExplorer.exe")
         if not os.path.exists(sbe_path):
             self.output_box.insert("end","ShellBagsExplorer.exe not Found! FATAL!")
         file_path = self.file_label.cget("text")
         subprocess.Popen([sbe_path, file_path])
 
-
-
+    
+    
 
     ## EXTRANEOUS FUNCTIONS
     def clear_output(self):
